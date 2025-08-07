@@ -8,14 +8,14 @@ class Settings(BaseSettings):
     APP_NAME: str = "Axiom API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
-    SECRET_KEY: str = "your-secret-key-here-change-in-production"
+    SECRET_KEY: str  # No default - must come from .env
     
     # Database Configuration
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_NAME: str = "axiom"
     DB_USER: str = "admin"
-    DB_PASSWORD: str = "nostromo!1112"
+    DB_PASSWORD: str  # No default - must come from .env
     DATABASE_URL: Optional[PostgresDsn] = None
     
     # Database connection pool settings

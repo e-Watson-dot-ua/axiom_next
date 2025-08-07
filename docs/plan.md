@@ -81,21 +81,16 @@ axiom_next/api/
 │   │       ├── transfers.py    # Transfer CRUD endpoints
 │   │       ├── lookup.py       # Lookup table endpoints
 │   │       └── audit.py        # Audit log endpoints
-│   ├── crud/
-│   │   ├── __init__.py
-│   │   ├── base.py             # Base CRUD operations
-│   │   ├── user.py             # User CRUD operations
-│   │   ├── division.py         # Division CRUD operations
-│   │   ├── order.py            # Order CRUD operations
-│   │   ├── assignment.py       # Assignment CRUD operations
-│   │   ├── transfer.py         # Transfer CRUD operations
-│   │   └── lookup.py           # Lookup CRUD operations
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── auth.py             # Authentication service
 │   │   ├── audit.py            # Audit logging service
-│   │   ├── division.py         # Division business logic
-│   │   ├── transfer.py         # Transfer business logic
+│   │   ├── user.py             # User business logic & data access
+│   │   ├── division.py         # Division business logic & data access
+│   │   ├── order.py            # Order business logic & data access
+│   │   ├── assignment.py       # Assignment business logic & data access
+│   │   ├── transfer.py         # Transfer business logic & data access
+│   │   ├── lookup.py           # Lookup business logic & data access
 │   │   └── notification.py     # Notification service
 │   └── utils/
 │       ├── __init__.py
@@ -169,43 +164,43 @@ axiom_next/api/
    - Division location tracking
 
 3. **Base CRUD Operations**
-   - Generic CRUD base class
+   - Implement service layer with combined data access & business logic
    - Soft delete implementation
    - Audit logging integration
 
 #### Phase 4: Orders & Assignments (Week 4)
 1. **Order Management**
-   - Order CRUD with relationships
+   - Order service with data access & business logic
    - Order recipients handling
    - Order terms tracking
    - Status workflow management
 
 2. **Assignment System**
-   - Assignment CRUD operations
+   - Assignment service with complete CRUD operations
    - Executor assignment
    - Priority and target type handling
    - Report content management
 
 3. **Business Logic Services**
-   - Order validation rules
+   - Order validation rules in service layer
    - Assignment workflow
    - Status transition logic
 
 #### Phase 5: Transfer System (Week 5)
 1. **Transfer Management**
-   - Transfer CRUD operations
+   - Transfer service with complete CRUD operations
    - Item transfer tracking
    - Active transfer management
    - Due date monitoring
 
 2. **Transfer Items**
-   - Item quantity tracking
+   - Item quantity tracking via service layer
    - Unit of measure handling
    - Item identifier uniqueness
    - Active status management
 
 3. **Transfer Business Logic**
-   - Single active transfer enforcement
+   - Single active transfer enforcement in service
    - Division location updates
    - Completion tracking
    - Validation rules
@@ -231,7 +226,7 @@ axiom_next/api/
 
 #### Phase 7: Testing & Documentation (Week 7)
 1. **Comprehensive Testing**
-   - Unit tests for all CRUD operations
+   - Unit tests for all service operations
    - Integration tests for workflows
    - Authentication and authorization tests
    - Database constraint tests
@@ -314,7 +309,7 @@ The `.env` file is already configured with:
 
 ### Success Criteria
 - All database tables accessible via API
-- Complete CRUD operations for all entities
+- Complete service-based operations for all entities
 - Proper authentication and authorization
 - Comprehensive audit logging
 - Performance meets requirements (sub-second response times)

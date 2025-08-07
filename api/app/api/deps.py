@@ -1,14 +1,15 @@
-from typing import Optional, Generator
+from typing import Optional, Generator, AsyncGenerator
 from fastapi import Depends, Query
 from sqlmodel import Session
 
-from app.core.database import get_db_session
+from app.core.database import get_session
 
 
 # Database session dependency
-def get_db() -> Generator[Session, None, None]:
+async def get_db() -> AsyncGenerator[Session, None]:
     # Database session dependency for API endpoints
-    yield from get_db_session()
+    async with get_session() as session:
+        yield session
 
 
 # Pagination parameters

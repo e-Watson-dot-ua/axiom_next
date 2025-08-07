@@ -20,7 +20,7 @@ app.add_middleware(
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "axiom-next-api"}
+    return {"status": "healthy", "service": "axiom-api"}
 
 # Root endpoint
 @app.get("/")

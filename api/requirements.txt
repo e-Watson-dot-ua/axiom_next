@@ -1,0 +1,82 @@
+# Core FastAPI framework
+fastapi>=0.104.0
+
+# SQLModel for database ORM (combines SQLAlchemy + Pydantic)
+sqlmodel>=0.0.14
+
+# Async PostgreSQL driver
+asyncpg>=0.29.0
+
+# Database migrations
+alembic>=1.13.0
+
+# Authentication and JWT handling
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# File upload support
+python-multipart>=0.0.6
+
+# ASGI server for production
+uvicorn[standard]>=0.24.0
+
+# Settings management
+pydantic-settings>=2.1.0
+
+# Development and Testing
+pytest>=7.4.0
+pytest-asyncio>=0.23.0
+httpx>=0.25.0
+
+# Additional useful packages
+python-dateutil>=2.8.2
+email-validator>=2.1.0
+
+# Environment variable loading
+python-dotenv>=1.0.0
+
+# CORS middleware (already included in FastAPI but explicit)
+starlette>=0.27.0
+
+# Type hints support
+typing-extensions>=4.8.0
+
+# JSON handling
+orjson>=3.9.0
+
+# Validation
+validators>=0.22.0
+
+# Timezone handling
+pytz>=2023.3
+
+# Logging
+structlog>=23.2.0
+
+# HTTP client for external API calls
+aiohttp>=3.9.0
+
+# Password strength validation
+zxcvbn>=4.4.28
+
+# Caching (optional for performance)
+redis>=5.0.0
+aioredis>=2.0.0
+
+# Monitoring and health checks
+prometheus-client>=0.19.0
+
+# Development tools
+black>=23.12.0
+isort>=5.13.0
+flake8>=6.1.0
+mypy>=1.8.0
+pre-commit>=3.6.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.5.0
+
+# Security scanning
+bandit>=1.7.5
+safety>=2.3.0

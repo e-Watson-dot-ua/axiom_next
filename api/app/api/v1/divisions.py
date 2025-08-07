@@ -1,20 +1,12 @@
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 
 from app.api.deps import include_deleted, search_query
 from app.models.division import Division
 from app.schemas.division import DivisionCreate, DivisionUpdate
 from app.services.division import get_division_service, DivisionService
-from app.services.division import (
-    DivisionNotFoundError,
-    DivisionCodeExistsError, 
-    ParentNotFoundError,
-    CircularReferenceError,
-    SelfParentError,
-    HasChildrenError
-)
 
-router = APIRouter(prefix = "/divisions", tags = ["divisions"])
+router = APIRouter(tags = ["divisions"])
 
 
 @router.get("/", response_model = List[Division])
@@ -58,16 +50,7 @@ async def get_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Get division by ID
-    try:
-        division = service.get_by_id(division_id, include_deleted = include_deleted)
-        if not division:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"Division with ID {division_id} not found"
-            )
-        return division
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
+    return service.get_by_id(division_id, include_deleted = include_deleted)
 
 
 @router.get("/by-code/{code}", response_model = Division)
@@ -77,16 +60,7 @@ async def get_division_by_code(
     service: DivisionService = Depends(get_division_service)
 ):
     # Get division by code
-    try:
-        division = service.get_by_code(code, include_deleted = include_deleted)
-        if not division:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"Division with code '{code}' not found"
-            )
-        return division
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
+    return service.get_by_code(code, include_deleted = include_deleted)
 
 
 @router.post("/", response_model = Division, status_code = status.HTTP_201_CREATED)
@@ -95,12 +69,7 @@ async def create_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Create new division
-    try:
-        return service.create(division_data)
-    except DivisionCodeExistsError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except ParentNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
+    return service.create(division_data)
 
 
 @router.put("/{division_id}", response_model = Division)
@@ -110,18 +79,7 @@ async def update_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Update division by ID
-    try:
-        return service.update(division_id, update_data)
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
-    except DivisionCodeExistsError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except ParentNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except CircularReferenceError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except SelfParentError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
+    return service.update(division_id, update_data)
 
 
 @router.patch("/{division_id}", response_model = Division)
@@ -131,18 +89,7 @@ async def patch_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Partially update division by ID
-    try:
-        return service.update(division_id, update_data)
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
-    except DivisionCodeExistsError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except ParentNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except CircularReferenceError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except SelfParentError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
+    return service.update(division_id, update_data)
 
 
 @router.delete("/{division_id}", status_code = status.HTTP_204_NO_CONTENT)
@@ -152,12 +99,7 @@ async def delete_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Delete division by ID
-    try:
-        service.delete(division_id, soft_delete = soft_delete)
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
-    except HasChildrenError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
+    service.delete(division_id, soft_delete = soft_delete)
 
 
 @router.post("/{division_id}/restore", response_model = Division)
@@ -166,24 +108,7 @@ async def restore_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Restore soft-deleted division
-    try:
-        division = service.get_by_id(division_id, include_deleted = True)
-        if not division:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"Division with ID {division_id} not found"
-            )
-        if not division.is_deleted:
-            raise HTTPException(
-                status_code = status.HTTP_400_BAD_REQUEST,
-                detail = "Division is not deleted"
-            )
-        
-        # Restore by updating is_deleted to False
-        restore_data = DivisionUpdate(is_deleted = False)
-        return service.update(division_id, restore_data)
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
+    return service.restore(division_id)
 
 
 # Hierarchical operations
@@ -194,18 +119,9 @@ async def get_division_children(
     service: DivisionService = Depends(get_division_service)
 ):
     # Get child divisions of a parent division
-    try:
-        # Verify parent exists
-        parent = service.get_by_id(division_id, include_deleted = include_deleted)
-        if not parent:
-            raise HTTPException(
-                status_code = status.HTTP_404_NOT_FOUND,
-                detail = f"Division with ID {division_id} not found"
-            )
-        
-        return service.get_children(division_id, include_deleted = include_deleted)
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
+    # Verify parent exists first
+    service.get_by_id(division_id, include_deleted = include_deleted)
+    return service.get_children(division_id, include_deleted = include_deleted)
 
 
 @router.get("/hierarchy/tree", response_model = List[Division])
@@ -225,14 +141,7 @@ async def move_division(
     service: DivisionService = Depends(get_division_service)
 ):
     # Move division to new parent with optional sort order
-    try:
-        return service.move_division(division_id, new_parent_id, new_sort_order)
-    except DivisionNotFoundError as e:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = str(e))
-    except CircularReferenceError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
-    except SelfParentError as e:
-        raise HTTPException(status_code = status.HTTP_400_BAD_REQUEST, detail = str(e))
+    return service.move_division(division_id, new_parent_id, new_sort_order)
 
 
 # Utility endpoints
@@ -242,14 +151,7 @@ async def get_available_codes(
     service: DivisionService = Depends(get_division_service)
 ):
     # Get list of available division codes
-    # This could be implemented in service later
-    all_divisions = service.get_list(active_only = True)
-    codes = [div.code for div in all_divisions]
-    
-    if prefix:
-        codes = [code for code in codes if code.startswith(prefix.upper())]
-    
-    return sorted(codes)
+    return service.get_available_codes(prefix = prefix)
 
 
 @router.get("/search/suggest", response_model = List[Division])

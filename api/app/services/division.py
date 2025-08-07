@@ -35,8 +35,15 @@ class SelfParentError(Exception):
 
 
 class HasChildrenError(Exception):
-    def __init__(self):
-        super().__init__("Cannot delete division with child divisions")
+    def __init__(self, children_count: int = 0):
+        self.children_count = children_count
+        super().__init__(f"Cannot delete division with {children_count} child divisions")
+
+
+class DivisionNotDeletedError(Exception):
+    def __init__(self, division_id: int):
+        self.division_id = division_id
+        super().__init__(f"Division with ID {division_id} is not deleted")
 
 
 class DivisionService:
@@ -203,7 +210,7 @@ class DivisionService:
         # Check if division has children
         children = self.get_children(division_id)
         if children:
-            raise HasChildrenError()
+            raise HasChildrenError(len(children))
         
         if soft_delete:
             division.is_deleted = True
@@ -271,6 +278,29 @@ class DivisionService:
             self._reorder_siblings(old_parent_id)
         
         return division
+    
+    def get_available_codes(self, prefix: Optional[str] = None) -> List[str]:
+        # Get list of available division codes with optional prefix filter
+        all_divisions = self.get_list(active_only = True)
+        codes = [div.code for div in all_divisions]
+        
+        if prefix:
+            codes = [code for code in codes if code.startswith(prefix.upper())]
+        
+        return sorted(codes)
+    
+    def restore(self, division_id: int) -> Division:
+        # Restore a soft-deleted division
+        division = self.get_by_id(division_id, include_deleted = True)
+        if not division:
+            raise DivisionNotFoundError(division_id)
+            
+        if not division.is_deleted:
+            raise DivisionNotDeletedError(division_id)
+        
+        # Restore by updating is_deleted to False
+        restore_data = DivisionUpdate(is_deleted = False)
+        return self.update(division_id, restore_data)
     
     # Private helper methods
     def _get_next_sort_order(self, parent_id: Optional[int]) -> int:

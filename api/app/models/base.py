@@ -125,36 +125,3 @@ class AuditLogBaseModel(BaseModel, table = True):
 class BaseResponse(SQLModel):
     # Base response schema
     id: int
-
-
-class BaseCreate(SQLModel):
-    # Base create schema
-    pass
-
-
-class BaseUpdate(SQLModel):
-    # Base update schema
-    pass
-
-
-class LookupResponse(BaseResponse):
-    # Response schema for lookup tables
-    code: str
-    name: str
-    sort_order: int
-    is_deleted: bool
-
-
-class LookupCreate(BaseCreate):
-    # Create schema for lookup tables
-    code: str
-    name: str
-    sort_order: Optional[int] = None
-
-
-class LookupUpdate(BaseUpdate):
-    # Update schema for lookup tables
-    code: Optional[str] = None
-    name: Optional[str] = None
-    sort_order: Optional[int] = None
-    is_deleted: Optional[bool] = None
